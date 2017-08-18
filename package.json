@@ -1,11 +1,7 @@
 {
-    "name": "mean-stack-registration-login-example",
+    "name": "movie-library-app",
     "version": "1.0.0",
     "description": "MEAN Stack User Registration and Login Example Application",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/cornflourblue/mean-stack-registration-login-example.git"
-    },
     "dependencies": {
         "bcryptjs": "^2.1.0",
         "body-parser": "^1.13.2",

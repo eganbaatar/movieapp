@@ -1,1 +1,27 @@
-﻿<h1>Hi {{vm.user.firstName}}!!</h1>
+﻿<h1>Welcome {{vm.user.firstName}}!!</h1>
+
+<div class="form-container">
+    <form method="post">
+        <div class="row">
+            <div class="form-group col-md-3">
+                <label for="title">Title</label>
+                <input type="text" id="name" class="form-control" ng-model="vm.movie.title" required />
+            </div>
+            <div class="form-group col-md-3">
+                <label for="actors">Actors</label>
+                <input type="text" id="actors" class="form-control" ng-model="vm.movie.actors" required />
+            </div>
+            <div class="form-group col-md-3">
+                <label for="duration">Duration</label>
+                <input type="number" id="duration" class="form-control" ng-model="vm.movie.duration" />
+            </div>
+            <div class="form-group col-md-3">
+                <label for="year">Production year</label>
+                <input type="number" id="year" class="form-control" ng-model="vm.movie.year" min="1800" max="5000" required />
+            </div>
+        </div>
+        <div class="form-group">
+            <button class="btn btn-primary" ng-click="vm.createMovie()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create movie</button>
+        </div>
+    </form>
+</div>

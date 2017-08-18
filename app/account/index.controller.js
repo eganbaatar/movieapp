@@ -19,6 +19,7 @@
             UserService.GetCurrent().then(function (user) {
                 vm.user = user;
             });
+
         }
 
         function saveUser() {
