@@ -11,6 +11,8 @@ var service = {};
 
 service.getById = getById;
 service.create = create;
+service.getAll = getAll;
+service.delete = _delete;
 
 module.exports = service;
 
@@ -55,7 +57,6 @@ function create(userParam) {
     function createMovie() {
         // set movieId to userParam
         var movie = _.omit(userParam);
-        movie.id = movieId;
         db.movies.insert(
             movie,
             function (err, doc) {
@@ -64,6 +65,37 @@ function create(userParam) {
                 deferred.resolve();
             });
     }
+
+    return deferred.promise;
+}
+
+function getAll() {
+    var deferred = Q.defer();
+
+    db.movies.find({}).toArray(
+        function (err, movies) {
+            if (err) deferred.reject(err.name + ': ' + err.message);
+
+            if(movies) {
+                deferred.resolve(_.omit(movies));
+            } else {
+                deferred.resolve();
+            }
+        });
+
+    return deferred.promise;
+}
+
+function _delete(_id) {
+    var deferred = Q.defer();
+
+    db.movies.remove(
+        { _id: mongo.helper.toObjectID(_id) },
+        function (err) {
+            if (err) deferred.reject(err.name + ': ' + err.message);
+
+            deferred.resolve();
+        });
 
     return deferred.promise;
 }

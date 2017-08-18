@@ -9,11 +9,21 @@
         var service = {};
 
         service.Create = Create;
+        service.GetAll = GetAll;
+        service.Delete = Delete;
 
         return service;
 
         function Create(movie) {
             return $http.post('/api/movies/create', movie).then(handleSuccess, handleError);
+        }
+
+        function GetAll() {
+            return $http.get('/api/movies/all').then(handleSuccess, handleError);
+        }
+
+        function Delete(_id) {
+            return $http.delete('/api/movies/' + _id).then(handleSuccess, handleError);
         }
 
         // private functions
