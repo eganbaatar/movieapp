@@ -14,16 +14,16 @@
 
         return service;
 
-        function Create(movie) {
-            return $http.post('/api/movies/create', movie).then(handleSuccess, handleError);
+        function Create(data) {
+            return $http.post('/api/movies/create', data).then(handleSuccess, handleError);
         }
 
         function GetAll() {
             return $http.get('/api/movies/all').then(handleSuccess, handleError);
         }
 
-        function Delete(_id) {
-            return $http.delete('/api/movies/' + _id).then(handleSuccess, handleError);
+        function Delete(data) {
+            return $http.delete('/api/movies/' + JSON.stringify(data)).then(handleSuccess, handleError);
         }
 
         // private functions

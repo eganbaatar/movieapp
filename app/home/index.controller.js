@@ -8,10 +8,12 @@
     function Controller(UserService, MovieService, FlashService, NgTableParams) {
         var vm = this;
         var self = this;
-
+        var socket = io.connect();         
+        
         vm.user = null;
         vm.movie = null;
         vm.movies = [];
+        vm.notifications = [];
 
         vm.createMovie = createMovie;
         vm.deleteMovie = deleteMovie;
@@ -32,10 +34,17 @@
             });
 
             fetchAllMovies();
+            vm.notifications.push({
+                username: 'user1',
+                msg: 'deleted movie'
+            });
         }
 
         function createMovie() {
-            MovieService.Create(vm.movie).then(function() {
+            MovieService.Create({
+                username: vm.user.username,
+                movie: vm.movie
+            }).then(function() {
                 FlashService.Success('Movie' + vm.movie.title + ' added successfully');
             })
             .catch(function (error) {
@@ -44,7 +53,11 @@
         }
 
         function deleteMovie(movie) {
-            MovieService.Delete(movie._id).then(function() {
+            MovieService.Delete({
+                username: vm.user.username,
+                id: movie._id,
+                title: movie.title
+            }).then(function() {
                 FlashService.Success('Movie ' + movie.title + ' deleted successfully');
             })
             .catch(function (error) {
@@ -60,6 +73,22 @@
                 FlashService.Error(error);
             });
         }
+
+        socket.on('movie:created', function(obj) {
+            vm.notifications.push({
+                username: obj.username,
+                msg: 'has created movie with title ' + obj.title 
+            });
+            fetchAllMovies();
+        });
+
+        socket.on('movie:deleted', function(obj) {
+            vm.notifications.push({
+                username: obj.username,
+                msg: 'has deleted movie with title ' + obj.title
+            });
+            fetchAllMovies();
+        });
     }
 
 })();

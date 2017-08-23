@@ -6,13 +6,17 @@ var movieService = require('services/movie.service');
 // routes
 router.get('/all', getAllMovies);
 router.post('/create', createMovie);
-router.delete('/:_id', deleteMovie);
+router.delete('/:data', deleteMovie);
 
 module.exports = router;
 
 function createMovie(req, res) {
-    movieService.create(req.body)
+    movieService.create(req.body.movie)
         .then(function () {
+            res.io.emit('movie:created', {
+                username: req.body.username,
+                title: req.body.movie.title
+            });
             res.sendStatus(200);
         })
         .catch(function (err) {
@@ -36,8 +40,13 @@ function getAllMovies(req, res) {
 }
 
 function deleteMovie(req, res) {
-    movieService.delete(req.params._id)
+    var data = JSON.parse(req.params.data);
+    movieService.delete(data.id)
         .then(function () {
+            res.io.emit("movie:deleted", {
+                username: data.username,
+                title: data.title
+            });
             res.sendStatus(200);
         })
         .catch(function (err) {

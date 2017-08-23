@@ -5,6 +5,16 @@ var session = require('express-session');
 var bodyParser = require('body-parser');
 var expressJwt = require('express-jwt');
 var config = require('config.json');
+var server = app.listen(3000, function () {
+    console.log('Server listening at http://' + server.address().address + ':' + server.address().port);
+});
+var io = require('socket.io').listen(server);
+
+app.use(function(req, res, next) {
+    res.io = io; 
+    next();
+});
+
 
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
@@ -27,7 +37,3 @@ app.get('/', function (req, res) {
     return res.redirect('/app');
 });
 
-// start server
-var server = app.listen(3000, function () {
-    console.log('Server listening at http://' + server.address().address + ':' + server.address().port);
-});
