@@ -20,12 +20,12 @@ module.exports = service;
 function getById(_id) {
     var deferred = Q.defer();
 
-    db.users.findById(_id, function (err, user) {
+    db.movies.findById(_id, function (err, movie) {
         if (err) deferred.reject(err.name + ': ' + err.message);
 
-        if (user) {
+        if (movie) {
             // return user (without hashed password)
-            deferred.resolve(_.omit(user, 'hash'));
+            deferred.resolve(_.omit(movie));
         } else {
             // user not found
             deferred.resolve();

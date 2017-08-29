@@ -2,6 +2,7 @@ var config = require('config.json');
 var express = require('express');
 var router = express.Router();
 var movieService = require('services/movie.service');
+var userService = require('services/user.service');
 
 // routes
 router.get('/all', getAllMovies);
@@ -62,12 +63,29 @@ function deleteMovie(req, res) {
 function rateMovie(req, res) {
     var userParam = req.body;
     movieService.rateMovie(userParam.movieId, userParam.userId, userParam.rating)
+
+        // Im sure following could be done better but does not know yet how 
+        // Trying to get movie and user object with help of their id's.
         .then(function () {
-            res.io.emit('movie:rated', {
-                title: req.body.movie.title,
-                timestamp: new Date()
+            movieService.getById(userParam.movieId)
+            .then(function(movie) {
+                userService.getById(userParam.userId)
+                .then(function(user) {
+                    res.io.emit("movie:rated", {
+                        title: movie.title,
+                        username: user.username,
+                        rating: userParam.rating,
+                        timestamp: new Date()
+                    });
+                    res.sendStatus(200);
+                })
+                .catch(function(err){
+                    res.status(400).send(err);
+                });
+            })
+            .catch(function(err) {
+                res.status(400).send(err);
             });
-            res.sendStatus(200);
         })
         .catch(function (err) {
             res.status(400).send(err);
