@@ -13,6 +13,7 @@ service.getById = getById;
 service.create = create;
 service.getAll = getAll;
 service.delete = _delete;
+service.rateMovie = rateMovie;
 
 module.exports = service;
 
@@ -57,6 +58,7 @@ function create(userParam) {
     function createMovie() {
         // set movieId to userParam
         var movie = _.omit(userParam);
+        
         db.movies.insert(
             movie,
             function (err, doc) {
@@ -69,19 +71,34 @@ function create(userParam) {
     return deferred.promise;
 }
 
-function getAll() {
+function getAll(userId) {
     var deferred = Q.defer();
+    db.movies.aggregate([
+        {
+           $project: {
+              title: 1,
+              actors: 1,
+              duration: 1,
+              year: 1, 
+              ratings: {
+                 $filter: {
+                    input: "$ratings",
+                    as: "rating",
+                    cond: { $eq: ["$$rating.userId", "59935b990832571092681039"] }
+                 }
+              }
+           }
+        }
+     ],
+     function (err, movies) {
+        if (err) deferred.reject(err.name + ': ' + err.message);
 
-    db.movies.find({}).toArray(
-        function (err, movies) {
-            if (err) deferred.reject(err.name + ': ' + err.message);
-
-            if(movies) {
-                deferred.resolve(_.omit(movies));
-            } else {
-                deferred.resolve();
-            }
-        });
+        if(movies) {
+            deferred.resolve(_.omit(movies));
+        } else {
+            deferred.resolve();
+        }
+    });
 
     return deferred.promise;
 }
@@ -91,6 +108,29 @@ function _delete(_id) {
 
     db.movies.remove(
         { _id: mongo.helper.toObjectID(_id) },
+        function (err) {
+            if (err) deferred.reject(err.name + ': ' + err.message);
+
+            deferred.resolve();
+        });
+
+    return deferred.promise;
+}
+
+function rateMovie(movieId, userId, rating) {
+    var deferred = Q.defer();
+    
+    db.movies.update(
+        {
+            _id: mongo.helper.toObjectID(movieId)
+        }, 
+        {
+            $push: { 
+                ratings: {
+                    $each: [{userId: userId, rating: rating}]
+                }
+            }
+        },
         function (err) {
             if (err) deferred.reject(err.name + ': ' + err.message);
 

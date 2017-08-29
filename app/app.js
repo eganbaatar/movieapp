@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('app', ['ui.router', 'ngTable'])
+        .module('app', ['ui.router', 'ngTable', 'ngStorage'])
         .config(config)
         .run(run);
 

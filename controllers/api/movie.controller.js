@@ -6,6 +6,7 @@ var movieService = require('services/movie.service');
 // routes
 router.get('/all', getAllMovies);
 router.post('/create', createMovie);
+router.post('/rate', rateMovie);
 router.delete('/:data', deleteMovie);
 
 module.exports = router;
@@ -15,7 +16,8 @@ function createMovie(req, res) {
         .then(function () {
             res.io.emit('movie:created', {
                 username: req.body.username,
-                title: req.body.movie.title
+                title: req.body.movie.title,
+                timestamp: new Date()
             });
             res.sendStatus(200);
         })
@@ -25,7 +27,9 @@ function createMovie(req, res) {
 }
 
 function getAllMovies(req, res) {
-    movieService.getAll()
+    var userId = req.user.sub;
+
+    movieService.getAll(userId)
         .then(function (data) {
             if(data) {
                 res.send(data);
@@ -45,7 +49,23 @@ function deleteMovie(req, res) {
         .then(function () {
             res.io.emit("movie:deleted", {
                 username: data.username,
-                title: data.title
+                title: data.title,
+                timestamp: new Date()
+            });
+            res.sendStatus(200);
+        })
+        .catch(function (err) {
+            res.status(400).send(err);
+        });
+}
+
+function rateMovie(req, res) {
+    var userParam = req.body;
+    movieService.rateMovie(userParam.movieId, userParam.userId, userParam.rating)
+        .then(function () {
+            res.io.emit('movie:rated', {
+                title: req.body.movie.title,
+                timestamp: new Date()
             });
             res.sendStatus(200);
         })

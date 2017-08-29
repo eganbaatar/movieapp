@@ -11,6 +11,7 @@
         service.Create = Create;
         service.GetAll = GetAll;
         service.Delete = Delete;
+        service.Rate = Rate;
 
         return service;
 
@@ -24,6 +25,10 @@
 
         function Delete(data) {
             return $http.delete('/api/movies/' + JSON.stringify(data)).then(handleSuccess, handleError);
+        }
+
+        function Rate(data) {
+            return $http.post('/api/movies/rate', data).then(handleSuccess, handleError);
         }
 
         // private functions

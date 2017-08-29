@@ -5,7 +5,7 @@
         .module('app')
         .controller('Home.IndexController', Controller);
 
-    function Controller(UserService, MovieService, FlashService, NgTableParams) {
+    function Controller(UserService, MovieService, FlashService, NgTableParams, $localStorage) {
         var vm = this;
         var self = this;
         var socket = io.connect();         
@@ -13,30 +13,30 @@
         vm.user = null;
         vm.movie = null;
         vm.movies = [];
-        vm.notifications = [];
 
         vm.createMovie = createMovie;
         vm.deleteMovie = deleteMovie;
-
+        vm.rateMovie = rateMovie;
+        vm.clearNotifications = clearNotifications;
         vm.tableParams = null;
         initController();
 
         function initController() {
             vm.movie = {};
 
+            // save notifications into local storage
+            vm.storage = $localStorage.$default({
+                notifications: []
+            });
+
             // get current user
             UserService.GetCurrent().then(function (user) {
                 vm.user = user;
+                fetchAllMovies();
             });
             
             vm.tableParams = new NgTableParams({}, {
                 dataset: vm.movies
-            });
-
-            fetchAllMovies();
-            vm.notifications.push({
-                username: 'user1',
-                msg: 'deleted movie'
             });
         }
 
@@ -74,21 +74,40 @@
             });
         }
 
+        function rateMovie(movie, rating) {
+            MovieService.Rate({
+                movieId: movie._id,
+                rating: rating,
+                userId: vm.user._id
+            }).then(function(data) {
+                FlashService.Success('Movie ' + movie.title + ' was rated with ' + rating);
+            })
+            .catch(function (error) {
+                FlashService.Error(error);
+            });                 
+        }
+
+        function clearNotifications() {
+            vm.storage.notifications.length = 0;
+        }
+
+        // Socket action listeners
         socket.on('movie:created', function(obj) {
-            vm.notifications.push({
+            vm.storage.notifications.unshift({
                 username: obj.username,
-                msg: 'has created movie with title ' + obj.title 
+                msg: 'has created movie with title ' + obj.title,
+                timestamp: obj.timestamp
             });
             fetchAllMovies();
         });
 
         socket.on('movie:deleted', function(obj) {
-            vm.notifications.push({
+            vm.storage.notifications.unshift({
                 username: obj.username,
-                msg: 'has deleted movie with title ' + obj.title
+                msg: 'has deleted movie with title ' + obj.title,
+                timestamp: obj.timestamp
             });
             fetchAllMovies();
         });
     }
-
 })();

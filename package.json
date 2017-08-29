@@ -1,7 +1,7 @@
 {
     "name": "movie-library-app",
     "version": "1.0.0",
-    "description": "MEAN Stack User Registration and Login Example Application",
+    "description": "Movie Library App",
     "dependencies": {
         "angular-ui-bootstrap": "^2.5.0",
         "bcryptjs": "^2.1.0",
