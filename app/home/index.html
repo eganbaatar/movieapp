@@ -43,7 +43,7 @@
                 </td>
             </tr>
         </table>
-        <form method="post">
+        <form method="post" name="addMovieForm">
                 <div class="form-group col-md-3">
                     <label for="title">Title</label>
                     <input type="text" id="name" class="form-control" ng-model="vm.movie.title" required />
@@ -62,7 +62,7 @@
                 </div>
                 <div class="form-group col-md-2">
                     <br>
-                    <button class="btn btn-primary" ng-click="vm.createMovie()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create movie</button>
+                    <button class="btn btn-primary" ng-disabled="addMovieForm.$invalid" ng-click="vm.createMovie()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create movie</button>
                 </div>
         </form>
     </div>
