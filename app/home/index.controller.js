@@ -113,7 +113,7 @@
         socket.on('movie:rated', function(obj) {
             vm.storage.notifications.unshift({
                 username: obj.username,
-                msg: 'has rated movie with title ' + obj.title + ' with ' + obj.rating + ' stars',
+                msg: 'has rated movie "' + obj.title + '" with ' + obj.rating + ' star',
                 timestamp: obj.timestamp
             });
             fetchAllMovies();
