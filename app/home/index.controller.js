@@ -46,7 +46,6 @@
                 movie: vm.movie
             }).then(function() {
                 FlashService.Success('Movie' + vm.movie.title + ' added successfully');
-                fetchAllMovies();
             })
             .catch(function (error) {
                 FlashService.Error(error);
@@ -60,7 +59,6 @@
                 title: movie.title
             }).then(function() {
                 FlashService.Success('Movie ' + movie.title + ' deleted successfully');
-                fetchAllMovies();
             })
             .catch(function (error) {
                 FlashService.Error(error);
@@ -83,7 +81,6 @@
                 userId: vm.user._id
             }).then(function(data) {
                 FlashService.Success('Movie ' + movie.title + ' was rated with ' + rating);
-                fetchAllMovies();
             })
             .catch(function (error) {
                 FlashService.Error(error);
@@ -101,6 +98,7 @@
                 msg: 'has created movie with title ' + obj.title,
                 timestamp: obj.timestamp
             });
+            fetchAllMovies();
         });
 
         socket.on('movie:deleted', function(obj) {
@@ -109,15 +107,16 @@
                 msg: 'has deleted movie with title ' + obj.title,
                 timestamp: obj.timestamp
             });
+            fetchAllMovies();
         });
 
         socket.on('movie:rated', function(obj) {
-            console.log("Movie rated");
             vm.storage.notifications.unshift({
                 username: obj.username,
-                msg: 'has rated movie with title ' + obj.title + ' with ' + obj.rating,
+                msg: 'has rated movie with title ' + obj.title + ' with ' + obj.rating + ' stars',
                 timestamp: obj.timestamp
             });
+            fetchAllMovies();
         });
     }
 })();

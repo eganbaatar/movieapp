@@ -14,6 +14,9 @@
                 <td width="10%"title="'Production year'" sortable="'year'">
                     {{movie.year}}</td>
 
+                <td width="10%" title="'Avg Rating'">
+                    <span class="glyphicon glyphicon-star" aria-hidden="true"></span> {{movie.avgRating}}
+                </td>    
                 <td width="10%" title="'Your rating'">
                     <div class="dropdown" ng-show="!movie.ratings || movie.ratings.length==0">
                         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">

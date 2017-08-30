@@ -56,7 +56,6 @@ function create(userParam) {
         });
 
     function createMovie() {
-        // set movieId to userParam
         var movie = _.omit(userParam);
         
         db.movies.insert(
@@ -80,11 +79,12 @@ function getAll(userId) {
               actors: 1,
               duration: 1,
               year: 1, 
+              avgRating: 1,
               ratings: {
                  $filter: {
                     input: "$ratings",
                     as: "rating",
-                    cond: { $eq: ["$$rating.userId", "59935b990832571092681039"] }
+                    cond: { $eq: ["$$rating.userId", userId] }
                  }
               }
            }
@@ -119,23 +119,40 @@ function _delete(_id) {
 
 function rateMovie(movieId, userId, rating) {
     var deferred = Q.defer();
-    
-    db.movies.update(
-        {
-            _id: mongo.helper.toObjectID(movieId)
-        }, 
-        {
-            $push: { 
-                ratings: {
-                    $each: [{userId: userId, rating: rating}]
+
+    service.getById(movieId)
+    .then(function(movie) {
+        var numberOfRating = movie.ratings ? movie.ratings.length : 0;
+        var avgRating = movie.avgRating ? movie.avgRating : 0;
+        var newAvgRating = (avgRating * numberOfRating + rating) / (numberOfRating + 1);
+
+        db.movies.update(
+            {
+                _id: mongo.helper.toObjectID(movieId)
+            }, 
+            {
+                // add new rating to movie
+                $push: { 
+                    ratings: {
+                        $each: [{userId: userId, rating: rating}]
+                    }
+                },
+
+                // update new average rating
+                $set: {
+                    avgRating: newAvgRating
                 }
+            },
+            function (err) {
+                if (err) deferred.reject(err.name + ': ' + err.message);
+    
+                deferred.resolve();
             }
-        },
-        function (err) {
-            if (err) deferred.reject(err.name + ': ' + err.message);
-
-            deferred.resolve();
-        });
-
+        );
+    })
+    .catch(function(err) {
+        deferred.reject(err.name + ': ' + err.message);
+    });
+    
     return deferred.promise;
 }
